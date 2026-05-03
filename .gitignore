@@ -1,0 +1,15 @@
+.Python
+.venv/
+__pycache__/
+*.pyc
+.env
+pip-selfcheck.json
+test/
+
+# Google Cloud credentials
+vision-api-project*.json
+google-vision*.json
+*credential*.json
+*.jpg
+*.jpeg
+*.png

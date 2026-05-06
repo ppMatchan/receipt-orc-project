@@ -7,7 +7,20 @@ class ReceiptImagePreprocessor:
     def __init__(self, max_width=1600):
         self.max_width = max_width
 
-    def preprocess(self, input_path, output_path):
+    def preprocess(self,  image_raw_path: str, processed_path: str):
+        input_path = Path(image_raw_path)
+        image_name = input_path.name
+        rotated_image_path = Path(processed_path) / f"rotated_{image_name}"
+        bold_image_path = Path(processed_path) / f"bold_{image_name}"
+
+        self.rotate_image(input_path, rotated_image_path)
+        
+        self.sharpen_threshold(rotated_image_path, bold_image_path)
+
+        return bold_image_path
+
+
+    def rotate_image(self, input_path, output_path):
         input_path = Path(input_path)
         output_path = Path(output_path)
 
@@ -65,10 +78,12 @@ class ReceiptImagePreprocessor:
         img = cv2.imread(input_path, 0) # read as Grayscale
         
         # Adjust contrast more intensively (make text darker on light background)
-        _, thresh = cv2.threshold(img, 150, 255, cv2.THRESH_BINARY_INV)
+        #_, thresh = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY_INV)
+        thresh = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                   cv2.THRESH_BINARY_INV, 11, 2)
         
         # Expand text size (Dilation) to connect broken lines
-        kernel = np.ones((2,2), np.uint8)
+        kernel = np.ones((1,1), np.uint8)
         img_dilation = cv2.dilate(thresh, kernel, iterations=1)
         
         # กลับสีกลับมาเป็นตัวหนังสือดำพื้นขาว Change the color back to black text on a white background.

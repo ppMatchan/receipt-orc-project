@@ -6,7 +6,7 @@ def main():
         processed_dir="pics/processed_pics"
     )
 
-    result = pipeline.run("pics/raw_pics/receipt6.jpg")
+    result = pipeline.run("pics/raw_pics/receipt1.jpg")
 
     print("===== FINAL RESULT =====")
     for item in result:

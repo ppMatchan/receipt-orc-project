@@ -1,7 +1,8 @@
+import os
 from src.db.dynamodb_client import get_dynamodb_resource
 
 
-CATEGORY_TABLE_NAME = "category_master"
+CATEGORY_TABLE_NAME = os.getenv("CATEGORY_MASTER_TABLE_NAME", "category_master")
 
 
 class CategoryRepository:

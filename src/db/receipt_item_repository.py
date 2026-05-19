@@ -1,11 +1,10 @@
 from datetime import datetime
+import os
 from uuid import uuid4
 
 from src.db.dynamodb_client import get_dynamodb_resource
 
-
-RECEIPT_ITEMS_TABLE_NAME = "receipt_items"
-
+RECEIPT_ITEMS_TABLE_NAME = os.getenv("RECEIPT_ITEMS_TABLE_NAME", "receipt_items")
 
 class ReceiptItemRepository:
     def __init__(self):

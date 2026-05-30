@@ -11,7 +11,7 @@ def get_dynamodb_resource():
     region_name = os.getenv("AWS_REGION", "ap-northeast-1")
     
     if endpoint_url:
-        # สำหรับ local DynamoDB
+        # DynamoDB Local を使用する場合
         return boto3.resource(
             "dynamodb",
             endpoint_url=endpoint_url,
@@ -20,7 +20,7 @@ def get_dynamodb_resource():
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "dummy"),
         )
     else:
-        # สำหรับ DynamoDB บน AWS จริง
+        # AWS 上の DynamoDB を使用する場合
         return boto3.resource(
             "dynamodb",
             region_name=region_name,

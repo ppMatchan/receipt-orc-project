@@ -11,6 +11,8 @@ class OcrProcessor:
         return
         
     def create_vision_client(self):
+        """Google Vision APIのクライアントを作成するメソッド。AWS Secrets Managerから認証情報を取得してクライアントを初期化する。"""
+
         secret_name = os.environ.get("GOOGLE_VISION_SECRET_NAME")
         region_name = os.environ.get("AWS_REGION", "ap-northeast-1")
 
@@ -29,7 +31,8 @@ class OcrProcessor:
         return vision.ImageAnnotatorClient(credentials=credentials)
     
     def text_ocr(self, image_path: str):
-
+        """ 画像からテキストを抽出するメソッド。Google Vision APIを使用して、画像内のテキストを検出し、抽出されたテキストを返す。"""
+        
         client = self.create_vision_client()
 
         with open(image_path, "rb") as image_file:

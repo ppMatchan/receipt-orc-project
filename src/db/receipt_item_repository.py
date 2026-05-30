@@ -6,6 +6,7 @@ from src.db.dynamodb_client import get_dynamodb_resource
 
 RECEIPT_ITEMS_TABLE_NAME = os.getenv("RECEIPT_ITEMS_TABLE_NAME", "receipt_items")
 
+# DynamoDBのreceipt_itemsテーブルデータを保存するためのリポジトリクラス
 class ReceiptItemRepository:
     def __init__(self):
         dynamodb = get_dynamodb_resource()

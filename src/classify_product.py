@@ -1,5 +1,6 @@
 from src.db.category_repository import CategoryRepository
 
+"""商品をカテゴリに分類するためのクラス"""
 
 class ClassifyProduct:
 

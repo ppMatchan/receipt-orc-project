@@ -4,7 +4,7 @@ dynamodb = get_dynamodb_resource()
 
 table = dynamodb.Table("receipt_items")
 
-
+# DynamoDB のレシートのアイテムテーブルを全件削除するスクリプト
 def clear_receipt_items():
     response = table.scan(
         ProjectionExpression="item_id"

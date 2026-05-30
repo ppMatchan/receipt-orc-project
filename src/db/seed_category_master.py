@@ -3,7 +3,7 @@ from pathlib import Path
 
 from src.db.category_repository import CategoryRepository
 
-
+# カテゴリーマスターテーブルに初期データを投入するスクリプト
 def seed_category_master():
     base_dir = Path(__file__).resolve().parents[2]
     json_path = base_dir / "data" / "categories_master.json"

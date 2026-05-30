@@ -4,7 +4,7 @@ dynamodb = get_dynamodb_resource()
 
 table = dynamodb.Table("category_master")
 
-
+# DynamoDB のテーブルをスキャンして全アイテムを取得する関数
 def scan_all_categories():
     response = table.scan()
     items = response.get("Items", [])
@@ -17,7 +17,7 @@ def scan_all_categories():
 
     return items
 
-
+# キーワードを検索して、該当するカテゴリを返す関数
 def search_keyword(keyword: str):
     items = scan_all_categories()
 

@@ -4,6 +4,7 @@ from src.db.dynamodb_client import get_dynamodb_resource
 CATEGORY_MASTER_TABLE_NAME = "category_master"
 RECEIPT_ITEMS_TABLE_NAME = "receipt_items"
 
+# カテゴリーマスターテーブルの作成
 def create_category_master_table():
     dynamodb = get_dynamodb_resource()
 
@@ -34,6 +35,7 @@ def create_category_master_table():
         else:
             raise
 
+# レシートアイテムテーブルの作成
 def create_receipt_items_table():
     dynamodb = get_dynamodb_resource()
 

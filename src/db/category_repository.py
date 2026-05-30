@@ -4,7 +4,8 @@ from src.db.dynamodb_client import get_dynamodb_resource
 
 CATEGORY_TABLE_NAME = os.getenv("CATEGORY_MASTER_TABLE_NAME", "category_master")
 
-
+# DynamoDBのcategory_masterテーブルデータを取得・保存するためのリポジトリクラス
+# category_id (PK) | category_name | keywords (list)
 class CategoryRepository:
     def __init__(self):
         dynamodb = get_dynamodb_resource()

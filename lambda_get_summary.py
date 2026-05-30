@@ -37,8 +37,8 @@ def lambda_handler(event, context):
         month = month.zfill(2)
         target_prefix = f"{year}-{month}"
 
-        # MVP: table ข้อมูลยังน้อย ใช้ scan + filter ไปก่อน
-        # purchase_datetime ตัวอย่าง: 2026-05-01T17:36:00
+        # MVP: DynamoDBのScanで対象月のデータを全件取得してから集計する → データ量が増えたらクエリベースに切り替える
+        # purchase_datetime 例: 2026-05-01T17:36:00
         scan_param = {
             "FilterExpression": Attr("purchase_datetime").begins_with(target_prefix)
         }

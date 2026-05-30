@@ -8,6 +8,9 @@ class ReceiptImagePreprocessor:
         self.max_width = max_width
 
     def preprocess(self,  image_raw_path: str, processed_path: str):
+        """ 画像をOCRに適した状態に前処理する
+        1. 画像の自動回転
+        2. 閾値でシャープ化して文字をくっきりさせる  """
         input_path = Path(image_raw_path)
         image_name = input_path.name
         rotated_image_path = Path(processed_path) / f"rotated_{image_name}"
@@ -21,18 +24,19 @@ class ReceiptImagePreprocessor:
 
 
     def rotate_image(self, input_path, output_path):
+        """ 画像を回転 """
         input_path = Path(input_path)
         output_path = Path(output_path)
 
         img = Image.open(input_path)
 
-        # auto rotate ตาม EXIF
+        # EXIFで画像を回転
         img = ImageOps.exif_transpose(img)
 
-        # RGB normalize
+        # RGB 正規化
         img = img.convert("RGB")
 
-        # resize not over [max_width] by keeping aspect ratio
+        # サイズを調整（幅が max_width を超える場合のみ）
         img = self.resize_keep_ratio(img)
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -40,8 +44,10 @@ class ReceiptImagePreprocessor:
 
         return output_path
 
-    # ปรับขนาดรูปภาพโดยรักษาอัตราส่วน (aspect ratio) และไม่ให้ความกว้างเกิน max_width
+    
     def resize_keep_ratio(self, img):
+        """画像をリサイズして幅を max_width に収める（アスペクト比を維持）"""
+        
         width, height = img.size
 
         if width <= self.max_width:
@@ -52,17 +58,18 @@ class ReceiptImagePreprocessor:
 
         return img.resize((self.max_width, new_height))
     
-    # sharpen in kernel form (may cause noise if receipt is already clear)
+    
     def sharpen_kernel(self, input_path, output_path):
+        """ カーネル形式で画像をシャープ化する """
         img = cv2.imread(input_path)
 
-        # grayscale
+        # グレースケール化してコントラストを上げる
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # contrast เบา ๆ
+        # コントラストを上げる
         gray = cv2.convertScaleAbs(gray, alpha=1.3, beta=10)
 
-        # sharpen
+        # シャープ化のカーネルを定義
         kernel = np.array([
             [0, -1, 0],
             [-1, 5, -1],
@@ -72,20 +79,21 @@ class ReceiptImagePreprocessor:
 
         cv2.imwrite(output_path, sharp)
     
-    # sharpen by thresholding (ทำให้พื้นขาวสะอาด ตัวหนังสือดำเข้ม) → เหมาะกับ OCR ที่เน้นอ่านตัวหนังสือเป็นหลัก
-    def sharpen_threshold(self, input_path, output_path):
 
-        img = cv2.imread(input_path, 0) # read as Grayscale
+    def sharpen_threshold(self, input_path, output_path):
+        """" 閾値で画像をシャープ化する """
+
+        img = cv2.imread(input_path, 0) # グレースケールで読み込む
         
-        # Adjust contrast more intensively (make text darker on light background)
+        # 閾値処理で文字をくっきりさせる
         #_, thresh = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY_INV)
         thresh = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
                                    cv2.THRESH_BINARY_INV, 11, 2)
         
-        # Expand text size (Dilation) to connect broken lines
+        # 膨張処理で文字を太くする
         kernel = np.ones((1,1), np.uint8)
         img_dilation = cv2.dilate(thresh, kernel, iterations=1)
         
-        # กลับสีกลับมาเป็นตัวหนังสือดำพื้นขาว Change the color back to black text on a white background.
+        # 反転して保存
         final_img = cv2.bitwise_not(img_dilation)
         cv2.imwrite(output_path, final_img)

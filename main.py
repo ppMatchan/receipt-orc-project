@@ -1,6 +1,7 @@
 
 from src.receipt_pipeline import ReceiptPipeline
 
+# localで動かすためのコード。Lambdaではlambda_handlerがエントリーポイントになる。
 def main():
     pipeline = ReceiptPipeline(
         processed_dir="pics/processed_pics"

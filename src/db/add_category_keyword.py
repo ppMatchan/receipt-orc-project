@@ -1,7 +1,7 @@
 from pathlib import Path
 import sys
 
-# ให้ import src ได้ แม้ run จาก scripts folder
+# プロジェクトのルートディレクトリを sys.path に追加
 project_root = Path(__file__).resolve().parents[1]
 sys.path.append(str(project_root))
 
@@ -12,7 +12,7 @@ TABLE_NAME = "category_master"
 CATEGORY_ID = "health_care"
 NEW_KEYWORDS = ["めぐ リズム"]
 
-
+# 手動でカテゴリにキーワードを追加するためのスクリプト
 def main():
     dynamodb = get_dynamodb_resource()
     table = dynamodb.Table(TABLE_NAME)
@@ -30,7 +30,7 @@ def main():
 
     keywords = item.get("keywords", [])
 
-    # กรณี DynamoDB คืนมาเป็น set
+    # DynamoDB から取得した keywords が set の場合は list に変換
     if isinstance(keywords, set):
         keywords = list(keywords)
 

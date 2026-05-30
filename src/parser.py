@@ -17,9 +17,9 @@ class ParseTextToLine:
     
     def load_keywords(self, file_name=""):
         """sumary_line
-        description: โหลดไฟล์ JSON ที่เก็บคำหลักและรูปแบบต่าง ๆ ที่ใช้ในการตรวจสอบบรรทัดสรุปยอด บรรทัดส่วนลด และบรรทัดที่ไม่ใช่รายการสินค้า เพื่อให้สามารถปรับแต่งและเพิ่มคำหลักได้ง่ายโดยไม่ต้องแก้ไขโค้ด
-        parameter file_name: ชื่อไฟล์ JSON ที่ต้องการโหลด เช่น "summary_keywords.json", "discount_keywords.json", หรือ "non_item_keywords.json"
-        return: ข้อมูลที่โหลดจากไฟล์ JSON ในรูปแบบของ dictionary หรือ list ขึ้นอยู่กับโครงสร้างของไฟล์ JSON นั้น ๆ
+        description: json ファイルからキーワードをロードする関数
+        parameter file_name: ファイル名（例: "summary_keywords.json")
+        return: キーワードの辞書オブジェクト
         """
         
         if not file_name:
@@ -33,9 +33,9 @@ class ParseTextToLine:
     
     def extract_receipt_datetime(self, text: str):
         """sumary_line
-        description: ดึงวันที่และเวลาจากข้อความในใบเสร็จ
-        parameter text: ข้อความที่ต้องการดึงวันที่และเวลา
-        return: datetime object หรือ None หากไม่พบ
+        description: テキストからレシートの日付と時間を抽出する関数
+        parameter text: 抽出するテキスト
+        return: datetime object または None (日付と時間が見つからない場合)
         """
         
         patterns = [
@@ -63,9 +63,9 @@ class ParseTextToLine:
     
     def normalize_text(self,text):
         """sumary_line
-        description: ทำความสะอาดข้อความโดยการลบช่องว่างและแปลงสัญลักษณ์ที่คล้ายกันให้เหมือนกัน เพื่อช่วยในการตรวจสอบ pattern ต่าง ๆ ได้แม่นยำขึ้น
-        parameter text: ข้อความที่ต้องการทำความสะอาด
-        return: ข้อความที่ทำความสะอาดแล้ว
+        description: テキストを正規化する関数。スペースを削除し、全角スペースを半角スペースに変換し、バックスラッシュを円マークに変換する。
+        parameter text: 正規化するテキスト
+        return: 正規化されたテキスト
         """
         
         return (
@@ -77,20 +77,19 @@ class ParseTextToLine:
         
     def is_discount_line(self, text):
         """sumary_line
-        description: ตรวจสอบว่าบรรทัดนั้นเป็นบรรทัดส่วนลดหรือไม่
-        parameter text: line text ที่ต้องการตรวจสอบ
-        return: True หากเป็นบรรทัดส่วนลด False หากไม่ใช่
+        description: テキストが割引行かどうかを判定する関数
+        parameter text: 判定するテキスト
+        return: 割引行の場合は True、それ以外の場合は False
         """
         
-        text = self.normalize_text(text)
-        # return any(pattern in text for pattern in self.DISCOUNT_PATTERNS) and not any(tel_keyword in text for tel_keyword in self.TEL_KEYWORDS)
+        text = self.normalize_text(text)        
         return any(pattern in text for pattern in self.DISCOUNT_PATTERNS) 
     
     def is_non_item_line(self, text):
         """sumary_line
-        description: ตรวจสอบว่าบรรทัดนั้นเป็นบรรทัดที่ไม่ใช่รายการสินค้าหรือไม่
-        parameter text: line text ที่ต้องการตรวจสอบ
-        return: True หากเป็นบรรทัดที่ไม่ใช่รายการสินค้า False หากไม่ใช่
+        description: テキストが非商品行かどうかを判定する関数
+        parameter text: 判定するテキスト
+        return: 非商品行の場合は True、それ以外の場合は False
         """
         compact = self.normalize_text(text)
 
@@ -115,10 +114,10 @@ class ParseTextToLine:
     
     def detect_summary_key(self, text, threshold=75):
         """sumary_line
-        description: ตรวจหาคีย์สรุปจากข้อความ
-        parameter text: line text ที่ลบราราคาออกแล้ว
-        parameter threshold: ค่า threshold
-        return: คีย์สรุปที่พบและคะแนน
+        description: テキストからサマリーキーを抽出する関数
+        parameter text: 抽出するテキスト
+        parameter threshold: 抽出のスコアの閾値（デフォルトは75）。この値以上のスコアが得られた場合にキーを返す。
+        return: 抽出されたキーとスコアのタプル。スコアが閾値未満の場合は (None, score) を返す。
         """
         
         text = self.normalize_text(text)
@@ -146,9 +145,9 @@ class ParseTextToLine:
         
     def is_phone_line(self, text):
         """sumary_line
-        description: ตรวจสอบว่าบรรทัดนั้นมีหมายเลขโทรศัพท์หรือไม่
-        parameter text: line text ที่ต้องการตรวจสอบ
-        return: True หากมีหมายเลขโทรศัพท์ False หากไม่มี
+        description: テキストが電話番号を含む行かどうかを判定する関数
+        parameter text: 判定するテキスト
+        return: 電話番号を含む場合は True、それ以外の場合は False
         """
         
         return (
@@ -158,9 +157,9 @@ class ParseTextToLine:
  
     def normalize_price_text(self, text: str) -> str:
         """sumary_line
-        description: ทำความสะอาดข้อความที่เป็นราคาหรือส่วนลด โดยการลบช่องว่างที่ไม่จำเป็นและจัดรูปแบบให้เหมาะสม เพื่อช่วยในการแปลงข้อความเป็นตัวเลขได้แม่นยำขึ้น
-        param text: price text เช่น "¥ 4 , 980" หรือ "4 , 980"
-        return: cleaned price text เช่น "¥4,980" หรือ "4,980"
+        description: 価格または割引のテキストを正規化する関数。不要なスペースを削除し、適切な形式に整形して、テキストを数値に変換しやすくする。
+        param text: 価格テキスト（例: "¥ 4 , 980" または "4 , 980"）
+        return: 正規化された価格テキスト（例: "¥4,980" または "4,980"）
         """
         
         # ¥ 4 , 980 -> ¥ 4,980
@@ -173,27 +172,27 @@ class ParseTextToLine:
 
     def extract_price(self, text, allow_plain_number=False):
         """sumary_line
-        description: ดึงราคาหรือส่วนลดจากข้อความ
-        parameter text: line text ที่ต้องการดึงราคา
-        parameter allow_plain_number: ตัวเลือกในการอนุญาตให้ดึงตัวเลขธรรมดา
-        return: ราคาหรือส่วนลดที่พบ
+        description: 価格または割引を抽出する関数
+        parameter text: 抽出するテキスト
+        parameter allow_plain_number: 通常の数字を抽出することを許可するかどうかのオプション
+        return: 抽出された価格または割引
         """
                 
-        # check if line contains phone number → skip
+        # 電話番号を含む行は価格行ではないと判断して None を返す
         if self.is_phone_line(text):
             return None
         
-        # normalize price text to handle cases like "¥ 4 , 980" or "4 , 980"
+        # "¥ 4 , 980" 、 "4 , 980"　→ "¥4,980" 、 "4,980" に正規化してから抽出する
         text = self.normalize_price_text(text)
 
-        # 1. discount for example : -80
+        # 1. 割引の抽出: -80 または −80
         minus_matches = re.findall(r"[-−]\s*[\d,\.]+", text)
         if minus_matches:
             raw = minus_matches[-1]
             raw = re.sub(r"[-−\s,\.]", "", raw)
             return -int(raw)
 
-        # 2. price with symbol for example : ¥128, \ 1.370
+        # 2. ¥128, \ 1.370　の「¥」,「\」,「￥」　を含む価格の抽出
         price_matches = re.findall(r"[¥￥\\]\s*\d[\d,\.\s]*", text)
         if price_matches:
             raw = price_matches[-1]
@@ -201,7 +200,7 @@ class ParseTextToLine:
             if raw.isdigit():
                 return int(raw)
 
-        # 2. price without symbol at end of line: フジンサイフ 4,980
+        # 2. 4,980 などシンボルがない価格の抽出
         price_matches = re.findall(r"\d{1,3}(?:[,.]\d{3})+|\d+", text)
 
         if price_matches:
@@ -211,11 +210,11 @@ class ParseTextToLine:
             if raw.isdigit():
                 return int(raw)
             
-        # 3. fallback: summary for example : 合計 / 6 点 * 1.479
+        # 3. フォールバック: 合計 / 6 点 * 1,479 (Google Vision がカンマをピリオドに誤認する対策)
         if allow_plain_number:
             nums = re.findall(r"\d[\d,\.]*", text)
             if nums:
-                raw = nums[-1]   # 6 and 1.479 → take 1.479
+                raw = nums[-1]   # 6 と 1.479 → 1.479
                 raw = raw.replace(",", "").replace(".", "")
                 return int(raw)
 
@@ -223,55 +222,55 @@ class ParseTextToLine:
 
     def normalize_price(self, price_text):
         """sumary_line
-        description: ทำความสะอาดข้อความที่เป็นราคา
-        parameter price_text: price text ที่ต้องการทำความสะอาด
-        return: cleaned price text
+        description: 価格テキストを正規化する関数。価格テキストから数字、カンマ、ドット以外の文字を削除し、適切な形式に整形して、整数に変換する。
+        parameter price_text: 価格テキスト（例: "¥ 4 , 980" または "4 , 980"）
+        return: 正規化された価格テキスト
         """
         
-        # get only digits, comma, and dot
+        # ¥ 4 , 980 -> 4980, 4 , 980 -> 4980
         cleaned = re.sub(r"[^\d,\.]", "", price_text)
 
-        # if both , and . → assume . is noise
+        #  「,」 と 「.」 → 「.」を排除（日本の価格表記では小数点は通常使用されないため）
         if "," in cleaned and "." in cleaned:
             cleaned = cleaned.replace(".", "")
 
-        # if only . → treat as thousand separator (Japan doesn't use decimal)
+        # 「.」を排除
         elif "." in cleaned:
             cleaned = cleaned.replace(".", "")
 
-        # remove comma
+        # 「,」を排除
         cleaned = cleaned.replace(",", "")
 
         return int(cleaned)
 
     def remove_amount_from_text(self, text):
         """sumary_line
-        description: ลบจำนวนเงินออกจากข้อความ
-        parameter text: line text ที่ต้องการลบจำนวนเงิน
-        return: text หลังจากลบจำนวนเงินแล้ว
+        description: テキストから価格や割引の金額を削除する関数。
+        parameter text: 金額を削除するテキスト
+        return: 金額が削除された後のテキスト
         """
-        # ลบ ¥128, ￥128, \ 1.370
+        # ¥128, ￥128, \ 1.370　の「￥」,「\」,「¥」　を排除
         text = re.sub(r"[¥￥\\]\s*[\d,\.]+", "", text)
 
-        # ลบจำนวนเงินที่เหลืออยู่
+        # 4,980 や 1.479 の「,」、「.」を排除
         text = re.sub(r"\d{1,3}(?:[,.]\d{3})+|\d+", "", text)
 
-        # ลบ -80 หรือ −80 (discount)
+        # -80 または −80　の「-」を排除 (割引)
         text = re.sub(r"[-−]\s*[\d,\.]+", "", text)
 
-        # ลบ % เช่น 20 %
+        # 「%」を排除
         text = re.sub(r"\d+\s*%", "", text)
 
-        # ลบช่องว่างซ้ำ
+        # スペースを排除
         text = re.sub(r"\s+", " ", text)
 
         return text.strip()
 
     def parse_receipt_lines(self, lines):
         """sumary_line
-        description: แยกบรรทัดของใบเสร็จออกเป็นรายการสินค้าและสรุปยอด
-        parameter lines: รายการบรรทัดของใบเสร็จ
-        return: object ของใบเสร็จที่แยกแล้ว
+        description: レシートのテキスト行を解析して、日付、商品リスト、サマリーを抽出する関数
+        parameter lines: リストの行
+        return: object のレシート
         """
         
         receipt_obj = {
@@ -283,29 +282,29 @@ class ParseTextToLine:
         for line in lines:
             line = line.strip()
 
-            # ตรวจสอบว่าบรรทัดนั้นมีวันที่หรือไม่
+            # 日付であるかどうかを確認して、日付を抽出
             dt = self.extract_receipt_datetime(line)
             if dt:
                 print(f"Extracted datetime: {dt} from line: {line}")
                 receipt_obj["datetime"] = dt
                 continue
             
-            # check non item line
+            # 非商品行であるかどうかを確認して、非商品行をスキップ
             if self.is_non_item_line(line):
                 print(f"Non-item line detected: {line}")
                 continue
 
-            # get name by removing price from text
+            # テキストから金額を削除して、商品名を抽出
             name = self.remove_amount_from_text(line)
 
-            # หากชื่อว่างเปล่าหลังจากลบจำนวนเงินออก แสดงว่าไม่ใช่รายการสินค้า ให้ข้ามบรรทัดนี้
+            # nameが空の場合は、商品行ではないと判断してスキップ
             if not name:
                 continue
 
-            # ตรวจสอบว่าบรรทัดนั้นเป็นบรรทัดสรุปยอดหรือไม่ โดยดูจากการมีคำที่บ่งบอกสรุปยอดและไม่มีคำที่บ่งบอกหมายเลขโทรศัพท์
+            # サマリーキーを検出して、サマリーに保存
             key, score = self.detect_summary_key(name)
 
-            # หากเป็นบรรทัดสรุปยอด ให้เก็บไว้ใน summary แทนที่จะเก็บเป็นสินค้า
+            # サマリー行の場合は、サマリーに金額を保存して、次の行へ
             if key:
                price = self.extract_price(line, allow_plain_number=True)
                receipt_obj["summary"][key] = price
@@ -314,7 +313,7 @@ class ParseTextToLine:
             else:
                 print (f"Not summary line: {name}, score={score}")
 
-            # get price
+            # 商品行の場合は、商品名と価格を抽出して、商品リストに保存
             price = self.extract_price(line)
 
             if price is None:
@@ -322,7 +321,7 @@ class ParseTextToLine:
 
 
             if self.is_discount_line(name):
-            # หากเป็นบรรทัดส่วนลด ให้หักส่วนลดจากสินค้าก่อนหน้า ถ้าไม่มีสินค้าก่อนหน้าให้เก็บไว้ใน summary แทน
+            # 割引行の場合は、最後の商品に割引を適用する。商品がない場合は、サマリーの割引リストに保存する。
                 if receipt_obj["items"]:
                     discount_amount = abs(price)
                     receipt_obj["items"][-1]["price"] -= discount_amount
